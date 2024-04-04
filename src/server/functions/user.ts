@@ -20,6 +20,7 @@ export default async function getUserFromMongoDB() {
     const newMongoUser = await UserModel.create(userData);
     return JSON.parse(JSON.stringify(newMongoUser));
   } catch (error) {
-    throw error;
+    console.log("error getUserFromMongoDB:", error);
+    return null;
   }
 }

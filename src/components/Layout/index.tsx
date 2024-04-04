@@ -1,13 +1,12 @@
 import React from "react";
 import Navbar from "../Navbar";
 
-interface LayoutProps extends React.HTMLAttributes<HTMLDivElement> {
+type Props = {
   className?: string;
   children: React.ReactNode;
   noNavbar?: Boolean;
-}
-
-export default function Layout({className = "", children, noNavbar, ...props}: LayoutProps) {
+};
+export default function Layout({className = "", children, noNavbar, ...props}: Props) {
   return (
     <div className={`flex flex-col h-screen ${noNavbar ? "" : "pt-14"} ${className}`} {...props}>
       {noNavbar ? null : <Navbar />}
