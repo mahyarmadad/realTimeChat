@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-import {InferSchemaType} from "mongoose";
+import mongoose, {InferSchemaType} from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -12,8 +11,7 @@ const userSchema = new mongoose.Schema(
   },
   {timestamps: true},
 );
-type User = InferSchemaType<typeof userSchema> & Document;
-
-const UserModel = mongoose.models.User || mongoose.model("User", userSchema);
+type User = InferSchemaType<typeof userSchema> & {_id: string} & Document;
+const UserModel = mongoose.models?.["users"] ?? mongoose.model("users", userSchema);
 export default UserModel;
 export type {User as UserType};

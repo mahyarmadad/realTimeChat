@@ -1,16 +1,19 @@
 "use client";
 
+import {UserType} from "@/server/models/user";
 import {Button} from "@mui/material";
 import {useCallback, useState} from "react";
 import {EssetionalAddOutline} from "react-icons-sax";
-import AddNewChatDialog from "../AddNewChatDialog";
+import AddNewChatDialog from "./AddNewChatDialog";
 
-export default function AddNewChat() {
+type Props = {
+  users: Array<UserType>;
+};
+export default function AddNewChat({users}: Props) {
   const [openAddChat, setOpenAddChat] = useState(false);
   const onOpenAddChat = useCallback(() => {
     setOpenAddChat(true);
   }, []);
-
   return (
     <div>
       <Button
@@ -20,7 +23,7 @@ export default function AddNewChat() {
         onClick={onOpenAddChat}>
         New Chat
       </Button>
-      <AddNewChatDialog open={openAddChat} setOpen={setOpenAddChat} />
+      <AddNewChatDialog open={openAddChat} setOpen={setOpenAddChat} users={users} />
     </div>
   );
 }

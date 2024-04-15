@@ -1,5 +1,5 @@
 import {COLORS} from "@/constants/colors";
-import getUserFromMongoDB from "@/server/functions/user";
+import {getUserFromMongoDB} from "@/server/functions/user";
 import {UserButton} from "@clerk/nextjs";
 import {Typography} from "@mui/material";
 import UserAccount from "./UserAccount";

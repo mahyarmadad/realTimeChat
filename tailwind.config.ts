@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+const {COLORS} = require("./src/constants/colors");
+
 const config: Config = {
   corePlugins: {
     preflight: false,
@@ -13,7 +15,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
-
+      colors:{
+        background: COLORS.background,
+        paperBackground: COLORS.paperBackground,
+        primary: COLORS.primary,
+        text: COLORS.text,
+        danger: COLORS.danger,
+        success: COLORS.success,
+        shade: COLORS.shade,
+      }
     },
   },
   plugins: [],

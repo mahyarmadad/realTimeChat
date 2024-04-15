@@ -4,7 +4,7 @@ import connectToMongoDB from "./database";
 
 connectToMongoDB();
 
-export default async function getUserFromMongoDB() {
+export async function getUserFromMongoDB() {
   try {
     const clerkUser = await currentUser();
     if (!clerkUser) return null;
@@ -20,7 +20,26 @@ export default async function getUserFromMongoDB() {
     const newMongoUser = await UserModel.create(userData);
     return JSON.parse(JSON.stringify(newMongoUser));
   } catch (error) {
-    console.log("error getUserFromMongoDB:", error);
+    console.error("error getUserFromMongoDB:", error);
     return null;
+  }
+}
+export async function updateUserProfileImage(userId: string, profileImageUrl: string) {
+  try {
+    const filter = {clerkID: userId};
+    const update = {clerkImageUrl: profileImageUrl};
+    await UserModel.findOneAndUpdate(filter, update, {new: true});
+    console.info("User profile image updated successfully");
+  } catch (error) {
+    console.error("Error updating user profile image:", error);
+  }
+}
+
+export async function getAllUsers() {
+  try {
+    const users = await UserModel.find({});
+    return JSON.parse(JSON.stringify(users));
+  } catch (error) {
+    throw error;
   }
 }

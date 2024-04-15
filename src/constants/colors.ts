@@ -1,5 +1,4 @@
-// #145250
-// #7ab099
+
 // #c3d47c
 // #e6a983
 // colorTextSecondary: "#ECE2D0",
