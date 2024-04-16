@@ -1,4 +1,3 @@
-
 // #c3d47c
 // #e6a983
 // colorTextSecondary: "#ECE2D0",
@@ -13,4 +12,6 @@ export const COLORS = {
   danger: "#941B0C",
   success: "#9BE564",
   shade: "#ECE2D0",
+  msgDone: "#007bff",
+  dateText: "#4b4b4b",
 };

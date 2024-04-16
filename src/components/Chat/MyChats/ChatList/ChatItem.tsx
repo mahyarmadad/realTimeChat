@@ -1,17 +1,20 @@
 "use client";
 
+import {formatTimeDate} from "@/functions/date";
 import {userRecoilAtom} from "@/recoil/user";
 import {ChatType} from "@/server/models/chat";
+import {MessageType} from "@/server/models/message";
 import {UserType} from "@/server/models/user";
-import {Avatar, ListItemButton, Typography} from "@mui/material";
+import {Avatar, ListItemButton, ListItemButtonProps, Typography} from "@mui/material";
 import {useMemo} from "react";
 import {useRecoilValue} from "recoil";
 
 type Props = {
   chat: ChatType;
-};
+  lastMessage: MessageType | undefined;
+} & ListItemButtonProps;
 
-export default function ChatItem({chat, ...props}: Props) {
+export default function ChatItem({chat, lastMessage, ...props}: Props) {
   const user = useRecoilValue(userRecoilAtom);
 
   const chatInfo = useMemo(() => {
@@ -20,22 +23,45 @@ export default function ChatItem({chat, ...props}: Props) {
       name = chat.groupName;
       image = chat.groupProfilePicture;
     } else {
-      const recepient = chat.users.find((item) => String(item?._id) !== user?._id) as
+      const recipient = chat.users.find((item) => String(item?._id) !== user?._id) as
         | UserType
         | undefined;
-      name = recepient?.username;
-      image = recepient?.clerkImageUrl;
+      name = recipient?.username;
+      image = recipient?.clerkImageUrl;
     }
     return {name, image};
   }, [chat, user]);
 
-  const lastMsg = useMemo(() => "", []);
-  const lastMsgSender = useMemo(() => "", []);
-  const lastMsgTime = useMemo(() => "", []);
+  const lastMessageInfo = useMemo(() => {
+    let lastMsgText, lastMsgSender, lastMsgTime;
+    if (lastMessage) {
+      lastMsgText = lastMessage.text;
+      lastMsgSender =
+        String(lastMessage?.sender._id) === user?._id ? "You" : lastMessage.sender.username;
+      lastMsgTime = formatTimeDate(lastMessage.createdAt);
+    }
+    return {
+      lastMsgText,
+      lastMsgSender,
+      lastMsgTime,
+    };
+  }, [lastMessage, user?._id]);
+
   return (
     <ListItemButton {...props}>
       <Avatar src={chatInfo.image || undefined} className="mr-2" />
-      <Typography>{chatInfo.name}</Typography>
+      <div className="w-full">
+        <div className="flex-center gap-2">
+          <Typography className="grow">{chatInfo.name}</Typography>
+          <Typography variant="caption">{lastMessageInfo.lastMsgTime}</Typography>
+        </div>
+        <div className="flex-center gap-2">
+          <Typography variant="caption" className="grow truncate">
+            {lastMessageInfo.lastMsgText}
+          </Typography>
+          <Typography variant="caption">{lastMessageInfo.lastMsgSender}</Typography>
+        </div>
+      </div>
     </ListItemButton>
   );
 }

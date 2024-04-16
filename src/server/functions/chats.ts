@@ -24,7 +24,16 @@ export async function getAllChats(userId: string) {
       users: {
         $in: [userId],
       },
-    }).populate("users");
+    })
+      .populate("users")
+      .populate("lastMessage")
+      .populate({
+        path: "lastMessage",
+        populate: {
+          path: "sender",
+        },
+      })
+      .sort({updatedAt: -1});
     // const chats = await ChatModel.find({
     //   createdBy: userId,
     // });

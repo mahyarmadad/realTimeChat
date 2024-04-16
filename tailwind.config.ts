@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+import type {Config} from "tailwindcss";
 
 const {COLORS} = require("./src/constants/colors");
 
@@ -15,7 +15,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors:{
+      colors: {
         background: COLORS.background,
         paperBackground: COLORS.paperBackground,
         primary: COLORS.primary,
@@ -23,7 +23,9 @@ const config: Config = {
         danger: COLORS.danger,
         success: COLORS.success,
         shade: COLORS.shade,
-      }
+        done: COLORS.msgDone,
+        dateText: COLORS.dateText,
+      },
     },
   },
   plugins: [],
