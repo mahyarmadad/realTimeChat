@@ -1,6 +1,8 @@
 import {currentUser} from "@clerk/nextjs";
 import UserModel from "../models/user";
 import connectToMongoDB from "./database";
+require("../models/message");
+require("../models/chat");
 
 connectToMongoDB();
 

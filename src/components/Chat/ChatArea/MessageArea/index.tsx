@@ -1,6 +1,6 @@
 import {selectedChatAtom} from "@/recoil/chat";
 import {userRecoilAtom} from "@/recoil/user";
-import {getChatMessages} from "@/server/functions/messages";
+import {getChatMessages, readAllMessages} from "@/server/functions/messages";
 import {MessageType} from "@/server/models/message";
 import {CircularProgress, Typography} from "@mui/material";
 import {useSnackbar} from "notistack";
@@ -28,6 +28,13 @@ export default function MessageArea({className = ""}: Props) {
       .catch((e) => enqueueSnackbar(e.message, {variant: "error"}))
       .finally(() => setLoading(false));
   }, [enqueueSnackbar, selectedChat]);
+
+  useEffect(() => {
+    if (!selectedChat?._id || !user?._id) return;
+    readAllMessages(selectedChat._id, user?._id).catch((e) =>
+      enqueueSnackbar(e.message, {variant: "error"}),
+    );
+  }, [enqueueSnackbar, selectedChat?._id, user?._id]);
 
   return (
     <div className={`p-4 bg-slate-700/20 flex flex-col gap-2 grow ${className}`}>

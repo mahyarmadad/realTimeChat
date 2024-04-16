@@ -5,7 +5,7 @@ import {userRecoilAtom} from "@/recoil/user";
 import {ChatType} from "@/server/models/chat";
 import {MessageType} from "@/server/models/message";
 import {UserType} from "@/server/models/user";
-import {Avatar, ListItemButton, ListItemButtonProps, Typography} from "@mui/material";
+import {Avatar, Badge, ListItemButton, ListItemButtonProps, Typography} from "@mui/material";
 import {useMemo} from "react";
 import {useRecoilValue} from "recoil";
 
@@ -33,20 +33,24 @@ export default function ChatItem({chat, lastMessage, ...props}: Props) {
   }, [chat, user]);
 
   const lastMessageInfo = useMemo(() => {
-    let lastMsgText, lastMsgSender, lastMsgTime;
+    let lastMsgText, lastMsgTime;
     if (lastMessage) {
       lastMsgText = lastMessage.text;
-      lastMsgSender =
-        String(lastMessage?.sender._id) === user?._id ? "You" : lastMessage.sender.username;
+      // lastMsgSender =
+      //   String(lastMessage?.sender._id) === user?._id ? "You" : lastMessage.sender.username;
       lastMsgTime = formatTimeDate(lastMessage.createdAt);
     }
     return {
       lastMsgText,
-      lastMsgSender,
+      // lastMsgSender,
       lastMsgTime,
     };
-  }, [lastMessage, user?._id]);
+  }, [lastMessage]);
 
+  const unreadCount = useMemo(
+    () => (user?._id ? chat.unreads?.[user?._id] || 0 : 0),
+    [chat.unreads, user?._id],
+  );
   return (
     <ListItemButton {...props}>
       <Avatar src={chatInfo.image || undefined} className="mr-2" />
@@ -59,7 +63,8 @@ export default function ChatItem({chat, lastMessage, ...props}: Props) {
           <Typography variant="caption" className="grow truncate">
             {lastMessageInfo.lastMsgText}
           </Typography>
-          <Typography variant="caption">{lastMessageInfo.lastMsgSender}</Typography>
+          <Badge badgeContent={unreadCount} color="info" />
+          {/* <Typography variant="caption">{lastMessageInfo.lastMsgSender}</Typography> */}
         </div>
       </div>
     </ListItemButton>
