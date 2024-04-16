@@ -3,6 +3,7 @@ import UserModel from "../models/user";
 import connectToMongoDB from "./database";
 require("../models/message");
 require("../models/chat");
+require("../models/images");
 
 connectToMongoDB();
 

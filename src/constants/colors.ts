@@ -14,4 +14,5 @@ export const COLORS = {
   shade: "#ECE2D0",
   msgDone: "#007bff",
   dateText: "#4b4b4b",
+  secondary: "#b98787",
 };

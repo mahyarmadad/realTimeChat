@@ -21,13 +21,11 @@ export default function Message({message, isuser, className = "", ...props}: Pro
        ${className}`}
       {...props}>
       <Typography>{message.text}</Typography>
-      <div className="flex-center gap-2">
+      <div className="flex-center gap-2 justify-end">
         <Typography variant="caption" fontSize={12} color="#4b4b4b">
           {formatTimeDate(message.createdAt)}
         </Typography>
-        <div className="text-done">
-          <CheckIcon sx={{fontSize: 12}} />
-        </div>
+        {isuser ? <CheckIcon sx={{fontSize: 12}} className="text-done" /> : null}
       </div>
 
       {/* <DoneAllIcon/> */}

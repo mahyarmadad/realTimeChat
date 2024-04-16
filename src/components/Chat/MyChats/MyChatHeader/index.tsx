@@ -1,6 +1,6 @@
 import {getAllUsers} from "@/server/functions/user";
 import {Typography} from "@mui/material";
-import AddNewChat from "../AddNewChat";
+import AddNewChat from "./AddNewChat";
 
 export default async function MyChatHeader() {
   const users = await getAllUsers();

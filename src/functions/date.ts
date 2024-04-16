@@ -17,7 +17,7 @@ export function formatTimeDate(date: Date): string {
     return `${hours}:${minutes}`;
   } else {
     const day = compareDate.getDate().toString().padStart(2, "0");
-    const month = (compareDate.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-based in JavaScript
+    const month = (compareDate.getMonth() + 1).toString().padStart(2, "0");
     const year = compareDate.getFullYear();
     return `${day} ${month} ${year}`;
   }

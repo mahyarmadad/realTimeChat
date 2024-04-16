@@ -2,6 +2,7 @@
 
 import {formatTimeDate} from "@/functions/date";
 import {userRecoilAtom} from "@/recoil/user";
+import {getImageFromDatabase} from "@/server/functions/image";
 import {ChatType} from "@/server/models/chat";
 import {MessageType} from "@/server/models/message";
 import {UserType} from "@/server/models/user";
@@ -21,7 +22,8 @@ export default function ChatItem({chat, lastMessage, ...props}: Props) {
     let name, image;
     if (chat.isGroupChat) {
       name = chat.groupName;
-      image = chat.groupProfilePicture;
+      if (chat.groupProfilePicture)
+        getImageFromDatabase(chat.groupProfilePicture).then((data) => (image = data));
     } else {
       const recipient = chat.users.find((item) => String(item?._id) !== user?._id) as
         | UserType
@@ -51,6 +53,7 @@ export default function ChatItem({chat, lastMessage, ...props}: Props) {
     () => (user?._id ? chat.unreads?.[user?._id] || 0 : 0),
     [chat.unreads, user?._id],
   );
+
   return (
     <ListItemButton {...props}>
       <Avatar src={chatInfo.image || undefined} className="mr-2" />

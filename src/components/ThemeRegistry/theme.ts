@@ -3,10 +3,13 @@ import {COLORS} from "@Constants/colors";
 const theme = createTheme({
   palette: {
     mode: "dark",
-    primary:{
-      main:COLORS.primary
+    primary: {
+      main: COLORS.primary,
     },
-    background:{default:COLORS.background,paper:COLORS.paperBackground}
+    secondary: {
+      main: COLORS.secondary,
+    },
+    background: {default: COLORS.background, paper: COLORS.paperBackground},
   },
   components: {
     MuiButton: {
@@ -21,6 +24,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 16,
+          backgroundImage: "none",
         },
       },
     },
