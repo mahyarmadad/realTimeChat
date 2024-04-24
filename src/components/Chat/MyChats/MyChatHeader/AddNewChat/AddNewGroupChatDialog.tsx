@@ -1,8 +1,8 @@
 import {DialogContainer} from "@/components/utils";
-import {chatListAtom} from "@/recoil/chat";
+import {chatListAtom, editGroupChatAtom} from "@/recoil/chat";
 import {userRecoilAtom} from "@/recoil/user";
-import {createNewChat} from "@/server/functions/chats";
-import {addImageToDatabase} from "@/server/functions/image";
+import {createNewChat, updateChat} from "@/server/functions/chats";
+import {addImageToDatabase, getImageFromDatabase} from "@/server/functions/image";
 import {UserType} from "@/server/models/user";
 import {LoadingButton} from "@mui/lab";
 import {
@@ -17,9 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import {useSnackbar} from "notistack";
-import {ChangeEvent, useCallback, useMemo, useState} from "react";
+import {ChangeEvent, useCallback, useEffect, useMemo, useState} from "react";
 import {ContentEditDocumentUploadLinear, EssetionalCloseCircleLinear} from "react-icons-sax";
-import {useRecoilValue, useSetRecoilState} from "recoil";
+import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 
 type Props = {
   open: boolean;
@@ -44,6 +44,7 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
   });
   const user = useRecoilValue(userRecoilAtom);
   const setChatList = useSetRecoilState(chatListAtom);
+  const [editGroupChat, setEditGroupChat] = useRecoilState(editGroupChatAtom);
 
   const disabledButton = useMemo(
     () => !groupInfo.groupName.trim() || !groupInfo.groupBio.trim() || !groupInfo.groupUsers.length,
@@ -51,8 +52,9 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
   );
 
   const onClose = useCallback(() => {
+    setEditGroupChat(null);
     setOpen(false);
-  }, [setOpen]);
+  }, [setEditGroupChat, setOpen]);
 
   const showList = useMemo(
     () => (users?.length ? users.filter((item) => item._id !== user?._id) : []),
@@ -100,7 +102,7 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
         groupBio: groupInfo.groupBio,
         groupAdmins: [user?._id],
       };
-      if (groupInfo.groupPhoto) {
+      if (groupInfo.groupPhoto && typeof groupInfo.groupPhoto !== "string") {
         const buffer = await groupInfo.groupPhoto.arrayBuffer();
         const groupImage = await addImageToDatabase({
           image: Buffer.from(buffer),
@@ -108,15 +110,40 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
         });
         payload = {...payload, groupProfilePicture: groupImage._id};
       }
-      const newChats = await createNewChat(payload);
-      setChatList(newChats);
-      enqueueSnackbar("Group Chat created successfully", {variant: "success"});
+      if (editGroupChat) {
+        const updatedChat = await updateChat(editGroupChat._id, payload);
+        setChatList((prev) => {
+          let cache = [...prev];
+          cache = cache.filter((item) => item._id === updatedChat._id);
+          cache.push(updatedChat);
+        });
+        enqueueSnackbar("Group Chat updated successfully", {variant: "success"});
+      } else {
+        const newChats = await createNewChat(payload);
+        setChatList(newChats);
+        enqueueSnackbar("Group Chat created successfully", {variant: "success"});
+      }
+      onClose();
     } catch (error: any) {
       enqueueSnackbar(error.message, {variant: "error"});
     } finally {
       setLoading(false);
     }
-  }, [enqueueSnackbar, groupInfo, setChatList, user?._id]);
+  }, [enqueueSnackbar, groupInfo, onClose, setChatList, user?._id, editGroupChat]);
+
+  useEffect(() => {
+    if (!editGroupChat) return;
+    setGroupInfo({
+      groupName: editGroupChat.groupName,
+      groupBio: editGroupChat.groupBio,
+      groupUsers: editGroupChat.users.map((item) => item._id),
+    });
+    if (editGroupChat.groupProfilePicture) {
+      getImageFromDatabase(editGroupChat.groupProfilePicture).then((data) => {
+        setGroupInfo((prev) => ({...prev, groupPhoto: data}));
+      });
+    }
+  }, [editGroupChat]);
   return (
     <DialogContainer open={open} fullScreen>
       <div className="flex flex-col p-4 h-full">
@@ -173,19 +200,15 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
                 fullWidth
                 multiline
               />
-              {/* <Image
-                    src={URL.createObjectURL(groupInfo.groupPhoto)}
-                    alt="chat profile"
-                    width={160}
-                    height={30}
-                    className="object-cover"
-                  /> */}
-
               <div
                 className={`bg-cover bg-center ${groupInfo.groupPhoto ? "center h-24" : ""}`}
                 style={{
                   backgroundImage: groupInfo.groupPhoto
-                    ? `url(${URL.createObjectURL(groupInfo.groupPhoto)})`
+                    ? `url(${
+                        typeof groupInfo.groupPhoto === "string"
+                          ? groupInfo.groupPhoto
+                          : URL.createObjectURL(groupInfo.groupPhoto)
+                      })`
                     : "none",
                 }}>
                 <Button
@@ -207,7 +230,7 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
                 loading={loading}
                 disabled={disabledButton}
                 className="mt-6">
-                Create
+                {editGroupChat ? "update" : "Create"}
               </LoadingButton>
             </div>
           </div>

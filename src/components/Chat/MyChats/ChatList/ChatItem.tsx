@@ -1,12 +1,12 @@
 "use client";
 
+import ChatAvatar from "@/components/utils/ChatAvatar";
 import {formatTimeDate} from "@/functions/date";
 import {userRecoilAtom} from "@/recoil/user";
-import {getImageFromDatabase} from "@/server/functions/image";
 import {ChatType} from "@/server/models/chat";
 import {MessageType} from "@/server/models/message";
 import {UserType} from "@/server/models/user";
-import {Avatar, Badge, ListItemButton, ListItemButtonProps, Typography} from "@mui/material";
+import {Badge, ListItemButton, ListItemButtonProps, Typography} from "@mui/material";
 import {useMemo} from "react";
 import {useRecoilValue} from "recoil";
 
@@ -18,21 +18,14 @@ type Props = {
 export default function ChatItem({chat, lastMessage, ...props}: Props) {
   const user = useRecoilValue(userRecoilAtom);
 
-  const chatInfo = useMemo(() => {
-    let name, image;
-    if (chat.isGroupChat) {
-      name = chat.groupName;
-      if (chat.groupProfilePicture)
-        getImageFromDatabase(chat.groupProfilePicture).then((data) => (image = data));
-    } else {
-      const recipient = chat.users.find((item) => String(item?._id) !== user?._id) as
-        | UserType
-        | undefined;
-      name = recipient?.username;
-      image = recipient?.clerkImageUrl;
-    }
-    return {name, image};
-  }, [chat, user]);
+  const recipient = useMemo(
+    () => chat.users.find((item) => String(item?._id) !== user?._id) as UserType | undefined,
+    [chat.users, user?._id],
+  );
+  const chatName = useMemo(
+    () => (chat.isGroupChat ? chat.groupName : recipient?.username),
+    [chat.groupName, chat.isGroupChat, recipient?.username],
+  );
 
   const lastMessageInfo = useMemo(() => {
     let lastMsgText, lastMsgTime;
@@ -56,10 +49,10 @@ export default function ChatItem({chat, lastMessage, ...props}: Props) {
 
   return (
     <ListItemButton {...props}>
-      <Avatar src={chatInfo.image || undefined} className="mr-2" />
+      <ChatAvatar selectedChat={chat} userImage={recipient?.clerkImageUrl || ""} className="mr-2" />
       <div className="w-full">
         <div className="flex-center gap-2">
-          <Typography className="grow">{chatInfo.name}</Typography>
+          <Typography className="grow">{chatName}</Typography>
           <Typography variant="caption">{lastMessageInfo.lastMsgTime}</Typography>
         </div>
         <div className="flex-center gap-2">

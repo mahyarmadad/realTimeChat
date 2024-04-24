@@ -6,6 +6,8 @@ import {MouseEvent, useCallback, useState} from "react";
 import {EssetionalAddOutline} from "react-icons-sax";
 import AddNewChatDialog from "./AddNewChatDialog";
 import AddNewGroupChatDialog from "./AddNewGroupChatDialog";
+import {useRecoilState} from "recoil";
+import {openAddEditGroupChatAtom} from "@/recoil/chat";
 
 type Props = {
   users: Array<UserType>;
@@ -13,7 +15,7 @@ type Props = {
 export default function AddNewChat({users}: Props) {
   const [openMenu, setOpenMenu] = useState<null | HTMLElement>(null);
   const [openAddChat, setOpenAddChat] = useState(false);
-  const [openAddGroupChat, setOpenAddGroupChat] = useState(false);
+  const [openAddGroupChat, setOpenAddGroupChat] = useRecoilState(openAddEditGroupChatAtom);
 
   const onOpenAddChat = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     setOpenMenu(e.currentTarget);
@@ -31,7 +33,7 @@ export default function AddNewChat({users}: Props) {
   const onNewGroupChat = useCallback(() => {
     setOpenAddGroupChat(true);
     handleClose();
-  }, [handleClose]);
+  }, [handleClose, setOpenAddGroupChat]);
 
   return (
     <div>

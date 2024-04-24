@@ -42,3 +42,11 @@ export async function getAllChats(userId: string) {
     throw error;
   }
 }
+export async function updateChat(chatId: string, payload: any) {
+  try {
+    const newChats = await ChatModel.findByIdAndUpdate(chatId, payload);
+    return JSON.parse(JSON.stringify(newChats));
+  } catch (error) {
+    throw error;
+  }
+}

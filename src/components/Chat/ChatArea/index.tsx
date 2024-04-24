@@ -4,21 +4,16 @@ import {selectedChatAtom} from "@/recoil/chat";
 import {userRecoilAtom} from "@/recoil/user";
 import {UserType} from "@/server/models/user";
 import {Typography} from "@mui/material";
-import {useCallback, useMemo} from "react";
+import {useCallback, useMemo, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
+import ChatInfoMenu from "./ChatInfoMenu";
 import MessageArea from "./MessageArea";
-import RecipientHeader from "./RecipientHeader";
 import MessageInput from "./MessageInput";
+import RecipientHeader from "./RecipientHeader";
 
 export default function ChatArea() {
+  const [openMenu, setOpenMenu] = useState(false);
   const [selectedChat, setSelectedChat] = useRecoilState(selectedChatAtom);
-  const user = useRecoilValue(userRecoilAtom);
-
-  const recipient = useMemo<UserType | undefined>(
-    () =>
-      selectedChat?.users.find((item) => String(item?._id) !== user?._id) as UserType | undefined,
-    [selectedChat, user?._id],
-  );
 
   const onBackClick = useCallback(() => {
     setSelectedChat(null);
@@ -26,7 +21,12 @@ export default function ChatArea() {
 
   return selectedChat ? (
     <div>
-      <RecipientHeader recipient={recipient} onBackClick={onBackClick} />
+      <RecipientHeader
+        selectedChat={selectedChat}
+        onBackClick={onBackClick}
+        setOpenMenu={setOpenMenu}
+      />
+      <ChatInfoMenu open={openMenu} setOpen={setOpenMenu} selectedChat={selectedChat} />
       <div className="overflow-auto h-[calc(100%-56px)] flex flex-col">
         <MessageArea />
         <MessageInput />
