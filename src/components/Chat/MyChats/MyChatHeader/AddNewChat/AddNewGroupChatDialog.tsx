@@ -36,6 +36,7 @@ type GroupInfo = {
 
 export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
   const [loading, setLoading] = useState(false);
+  const [imageSrc, setImageSrc] = useState("");
   const [groupInfo, setGroupInfo] = useState<GroupInfo>({
     groupName: "",
     groupBio: "",
@@ -72,7 +73,10 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
   const onFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
     const file = e.target.files?.[0];
-    if (file) setGroupInfo((prev) => ({...prev, [name]: file}));
+    if (file) {
+      setGroupInfo((prev) => ({...prev, [name]: file}));
+      setImageSrc(URL.createObjectURL(file));
+    }
   }, []);
 
   const onUserChange = useCallback(
@@ -94,7 +98,7 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
     try {
       setLoading(true);
       let payload = {
-        users: [...groupInfo.groupUsers, user?._id],
+        users: [...new Set([...groupInfo.groupUsers, user?._id])],
         createdBy: user?._id,
         isGroupChat: true,
         groupName: groupInfo.groupName,
@@ -112,10 +116,12 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
       }
       if (editGroupChat) {
         const updatedChat = await updateChat(editGroupChat._id, payload);
+        console.log("updatedChat", updatedChat);
         setChatList((prev) => {
           let cache = [...prev];
           cache = cache.filter((item) => item._id === updatedChat._id);
           cache.push(updatedChat);
+          return cache;
         });
         enqueueSnackbar("Group Chat updated successfully", {variant: "success"});
       } else {
@@ -139,8 +145,9 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
       groupUsers: editGroupChat.users.map((item) => item._id),
     });
     if (editGroupChat.groupProfilePicture) {
+      setGroupInfo((prev) => ({...prev, groupPhoto: editGroupChat.groupProfilePicture}));
       getImageFromDatabase(editGroupChat.groupProfilePicture).then((data) => {
-        setGroupInfo((prev) => ({...prev, groupPhoto: data}));
+        setImageSrc(data);
       });
     }
   }, [editGroupChat]);
@@ -200,17 +207,10 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
                 fullWidth
                 multiline
               />
+
               <div
                 className={`bg-cover bg-center ${groupInfo.groupPhoto ? "center h-24" : ""}`}
-                style={{
-                  backgroundImage: groupInfo.groupPhoto
-                    ? `url(${
-                        typeof groupInfo.groupPhoto === "string"
-                          ? groupInfo.groupPhoto
-                          : URL.createObjectURL(groupInfo.groupPhoto)
-                      })`
-                    : "none",
-                }}>
+                style={{backgroundImage: imageSrc ? `url(${imageSrc})` : "none"}}>
                 <Button
                   component="label"
                   role={undefined}

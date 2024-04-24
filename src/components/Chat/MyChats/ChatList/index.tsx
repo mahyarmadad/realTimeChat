@@ -50,14 +50,14 @@ export default function ChatList() {
           <div className="center my-4">
             <CircularProgress />
           </div>
-        ) : chatList.length ? (
+        ) : chatList?.length ? (
           chatList
             .filter((item) => item.users.find((u) => String(u._id) !== user?._id))
             .map((item) => (
               <ChatItem
                 key={item._id}
                 chat={item}
-                lastMessage={item.lastMessage}
+                lastMessage={item?.lastMessage}
                 onClick={onChatClick(item)}
                 selected={item._id === selectedChat?._id}
               />

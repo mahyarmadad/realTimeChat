@@ -32,5 +32,5 @@ export default function ChatAvatar({selectedChat, userImage, ...props}: Props) {
     }
   }, [enqueueSnackbar, selectedChat, userImage]);
 
-  return <div>{loading ? <CircularProgress /> : <Avatar src={imageSrc} {...props} />}</div>;
+  return <div>{loading ? <CircularProgress /> : <Avatar src={imageSrc || ""} {...props} />}</div>;
 }
