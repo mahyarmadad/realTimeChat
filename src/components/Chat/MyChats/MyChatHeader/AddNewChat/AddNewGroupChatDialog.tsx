@@ -54,6 +54,14 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
 
   const onClose = useCallback(() => {
     setEditGroupChat(null);
+    setLoading(false);
+    setImageSrc("");
+    setGroupInfo({
+      groupName: "",
+      groupBio: "",
+      groupPhoto: null,
+      groupUsers: [],
+    });
     setOpen(false);
   }, [setEditGroupChat, setOpen]);
 
@@ -116,7 +124,6 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
       }
       if (editGroupChat) {
         const updatedChat = await updateChat(editGroupChat._id, payload);
-        console.log("updatedChat", updatedChat);
         setChatList((prev) => {
           let cache = [...prev];
           cache = cache.filter((item) => item._id === updatedChat._id);
@@ -138,6 +145,7 @@ export default function AddNewGroupChatDialog({open, setOpen, users}: Props) {
   }, [enqueueSnackbar, groupInfo, onClose, setChatList, user?._id, editGroupChat]);
 
   useEffect(() => {
+    console.log("editGroupChat", editGroupChat);
     if (!editGroupChat) return;
     setGroupInfo({
       groupName: editGroupChat.groupName,

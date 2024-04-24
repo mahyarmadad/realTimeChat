@@ -36,7 +36,9 @@ export default function AddNewChatDialog({open, setOpen, users}: Props) {
         ? users.filter(
             (item) =>
               item._id !== user?._id &&
-              !chatList?.some((chat) => chat.users.find((cu) => String(cu._id) === item._id)),
+              !chatList?.some(
+                (chat) => !chat.isGroupChat && chat.users.find((cu) => String(cu._id) === item._id),
+              ),
           )
         : [],
     [users, chatList, user],
